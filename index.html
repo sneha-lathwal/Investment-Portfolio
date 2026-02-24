@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vaultex — Investment Portfolio Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loader" class="loader" aria-live="polite" aria-label="Loading dashboard">
+    <div class="loader-inner">
+      <div class="loader-logo">V</div>
+      <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="assertive"></div>
+
+  <!-- Confirm Modal -->
+  <div id="confirm-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title" hidden>
+    <div class="modal-box confirm-box">
+      <h3 id="confirm-title">Confirm Action</h3>
+      <p id="confirm-message">Are you sure you want to proceed?</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="confirm-ok" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Investment Modal -->
+  <div id="invest-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close" aria-label="Close modal">&times;</button>
+      <h2 id="modal-title">Add Investment</h2>
+      <form id="invest-form" novalidate>
+        <input type="hidden" id="edit-id" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="asset-name">Asset Name</label>
+            <input type="text" id="asset-name" placeholder="e.g. Apple Inc." autocomplete="off" required aria-required="true" />
+          </div>
+          <div class="form-group">
+            <label for="asset-type">Asset Type</label>
+            <select id="asset-type" required aria-required="true">
+              <option value="">Select type...</option>
+              <option value="Stock">Stock</option>
+              <option value="Crypto">Crypto</option>
+              <option value="ETF">ETF</option>
+              <option value="Mutual Fund">Mutual Fund</option>
+              <option value="Bond">Bond</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="invested-amount">Invested Amount ($)</label>
+            <input type="number" id="invested-amount" placeholder="0.00" min="0.01" step="0.01" required aria-required="true" />
+          </div>
+          <div class="form-group">
+            <label for="current-value">Current Value ($)</label>
+            <input type="number" id="current-value" placeholder="0.00" min="0" step="0.01" required aria-required="true" />
+          </div>
+          <div class="form-group form-full">
+            <label for="invest-date">Date of Investment</label>
+            <input type="date" id="invest-date" required aria-required="true" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="form-submit-btn">Add Investment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar" id="navbar" role="banner">
+    <div class="nav-brand">
+      <span class="brand-logo">V</span>
+      <span class="brand-name">Vaultex</span>
+    </div>
+    <nav class="nav-links" role="navigation" aria-label="Main navigation">
+      <a href="#hero">Home</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#analytics">Analytics</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" id="theme-toggle" aria-label="Toggle theme" title="Toggle dark/light mode">
+        <span id="theme-icon">☀️</span>
+      </button>
+      <button class="btn btn-primary btn-sm" id="nav-add-btn" aria-label="Add new investment">+ Add</button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <a href="#hero" class="mobile-link">Home</a>
+    <a href="#dashboard" class="mobile-link">Dashboard</a>
+    <a href="#analytics" class="mobile-link">Analytics</a>
+  </div>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="hero-bg"></div>
+      <div class="hero-content reveal">
+        <div class="hero-badge">Portfolio Intelligence Platform</div>
+        <h1 id="hero-title" class="hero-title">Master Your<br /><span class="gradient-text">Investments</span></h1>
+        <p class="hero-subtitle">Track, analyze, and optimize your entire portfolio across stocks, crypto, ETFs and more — all in one powerful dashboard.</p>
+        <div class="hero-ctas">
+          <a href="#dashboard" class="btn btn-primary btn-lg">Launch Dashboard</a>
+          <a href="#analytics" class="btn btn-outline btn-lg">View Analytics</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hs-value">Real-time</span>
+            <span class="hs-label">P&L Tracking</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hs-value">Multi-asset</span>
+            <span class="hs-label">Coverage</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hs-value">Offline</span>
+            <span class="hs-label">Capable</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual reveal-right">
+        <div class="floating-card fc1">
+          <span class="fc-label">Portfolio Value</span>
+          <span class="fc-value" id="hero-total">$0.00</span>
+        </div>
+        <div class="floating-card fc2">
+          <span class="fc-label">Total Return</span>
+          <span class="fc-value positive" id="hero-return">+0.00%</span>
+        </div>
+        <div class="hero-ring"></div>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="section dashboard-section" aria-labelledby="dashboard-title">
+      <div class="section-header reveal">
+        <div>
+          <h2 id="dashboard-title" class="section-title">Portfolio Dashboard</h2>
+          <p class="section-sub">Your complete investment overview</p>
+        </div>
+        <button class="btn btn-primary" id="add-investment-btn" aria-label="Add new investment">+ New Investment</button>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-grid reveal">
+        <div class="summary-card" data-metric="invested">
+          <div class="sc-icon">💰</div>
+          <div class="sc-info">
+            <span class="sc-label">Total Invested</span>
+            <span class="sc-value" id="total-invested">$0.00</span>
+          </div>
+        </div>
+        <div class="summary-card" data-metric="value">
+          <div class="sc-icon">📈</div>
+          <div class="sc-info">
+            <span class="sc-label">Current Value</span>
+            <span class="sc-value" id="current-total">$0.00</span>
+          </div>
+        </div>
+        <div class="summary-card" data-metric="pl">
+          <div class="sc-icon">⚡</div>
+          <div class="sc-info">
+            <span class="sc-label">Total P&L</span>
+            <span class="sc-value" id="total-pl">$0.00</span>
+          </div>
+        </div>
+        <div class="summary-card" data-metric="assets">
+          <div class="sc-icon">🏦</div>
+          <div class="sc-info">
+            <span class="sc-label">Total Assets</span>
+            <span class="sc-value" id="total-assets">0</span>
+          </div>
+        </div>
+        <div class="summary-card" data-metric="best">
+          <div class="sc-icon">🚀</div>
+          <div class="sc-info">
+            <span class="sc-label">Best Performer</span>
+            <span class="sc-value sc-name" id="best-performer">—</span>
+          </div>
+        </div>
+        <div class="summary-card" data-metric="worst">
+          <div class="sc-icon">📉</div>
+          <div class="sc-info">
+            <span class="sc-label">Worst Performer</span>
+            <span class="sc-value sc-name" id="worst-performer">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-bar reveal">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="search" id="search-input" placeholder="Search investments..." aria-label="Search investments" />
+        </div>
+        <select id="filter-type" aria-label="Filter by asset type">
+          <option value="all">All Types</option>
+          <option value="Stock">Stock</option>
+          <option value="Crypto">Crypto</option>
+          <option value="ETF">ETF</option>
+          <option value="Mutual Fund">Mutual Fund</option>
+          <option value="Bond">Bond</option>
+          <option value="Real Estate">Real Estate</option>
+          <option value="Other">Other</option>
+        </select>
+        <select id="sort-by" aria-label="Sort investments">
+          <option value="date-desc">Newest First</option>
+          <option value="date-asc">Oldest First</option>
+          <option value="pl-desc">Best P&L</option>
+          <option value="pl-asc">Worst P&L</option>
+          <option value="value-desc">Highest Value</option>
+          <option value="value-asc">Lowest Value</option>
+        </select>
+      </div>
+
+      <!-- Investments Table -->
+      <div class="table-wrapper reveal" id="table-section">
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-icon">📊</div>
+          <h3>No investments yet</h3>
+          <p>Start building your portfolio by adding your first investment.</p>
+          <button class="btn btn-primary" id="empty-add-btn">+ Add Investment</button>
+        </div>
+        <div id="table-container">
+          <table class="invest-table" id="invest-table" aria-label="Investments table">
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Type</th>
+                <th>Invested</th>
+                <th>Current</th>
+                <th>P&L</th>
+                <th>Return %</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invest-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics -->
+    <section id="analytics" class="section analytics-section" aria-labelledby="analytics-title">
+      <div class="section-header reveal">
+        <div>
+          <h2 id="analytics-title" class="section-title">Portfolio Analytics</h2>
+          <p class="section-sub">Visual breakdown of your investments</p>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card reveal">
+          <div class="chart-card-header">
+            <h3>Allocation by Type</h3>
+            <span class="chart-badge">Distribution</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="allocation-chart" aria-label="Portfolio allocation pie chart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card reveal">
+          <div class="chart-card-header">
+            <h3>P&L by Asset</h3>
+            <span class="chart-badge">Performance</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="pl-chart" aria-label="Profit and loss bar chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Management -->
+    <section id="data-section" class="section data-section" aria-labelledby="data-title">
+      <div class="section-header reveal">
+        <div>
+          <h2 id="data-title" class="section-title">Data Management</h2>
+          <p class="section-sub">Import, export, or reset your portfolio data</p>
+        </div>
+      </div>
+      <div class="data-cards reveal">
+        <div class="data-card">
+          <div class="data-card-icon">⬇️</div>
+          <h3>Export Portfolio</h3>
+          <p>Download your portfolio as a JSON file for backup or sharing.</p>
+          <button class="btn btn-primary" id="export-btn" aria-label="Export portfolio to JSON">Export JSON</button>
+        </div>
+        <div class="data-card">
+          <div class="data-card-icon">⬆️</div>
+          <h3>Import Portfolio</h3>
+          <p>Restore your portfolio from a previously exported JSON file.</p>
+          <button class="btn btn-primary" id="import-btn" aria-label="Import portfolio from JSON">Import JSON</button>
+          <input type="file" id="import-file" accept=".json" hidden aria-label="Select JSON file to import" />
+        </div>
+        <div class="data-card data-card-danger">
+          <div class="data-card-icon">🗑️</div>
+          <h3>Clear All Data</h3>
+          <p>Permanently delete all investments and reset your portfolio.</p>
+          <button class="btn btn-danger" id="clear-btn" aria-label="Clear all portfolio data">Clear All</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="brand-logo">V</span>
+        <span class="brand-name">Vaultex</span>
+      </div>
+      <p class="footer-copy">Your data stays on your device. No servers, no tracking.</p>
+      <p class="footer-note">© 2025 Vaultex. Built for investors, by design.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
