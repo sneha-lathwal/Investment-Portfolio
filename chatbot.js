@@ -29,26 +29,27 @@ const el = {
 function buildPortfolioContext() {
   try {
     const raw = localStorage.getItem('vaultex_portfolio');
-
     if (!raw) return 'STATUS: NO_DATA — The user has not added any investments yet.';
 
     const portfolio = JSON.parse(raw);
-
     if (!Array.isArray(portfolio) || portfolio.length === 0)
       return 'STATUS: NO_DATA — The user has not added any investments yet.';
 
-    const totalInvested = portfolio.reduce((s, i) => s + (i.invested || 0), 0);
-    const totalValue    = portfolio.reduce((s, i) => s + (i.current  || 0), 0);
+    // ✅ Fixed: using correct field names from localStorage
+    const totalInvested = portfolio.reduce((s, i) => s + (i.investedAmount || 0), 0);
+    const totalValue    = portfolio.reduce((s, i) => s + (i.currentValue   || 0), 0);
     const totalPL       = totalValue - totalInvested;
     const returnPct     = totalInvested > 0
       ? ((totalPL / totalInvested) * 100).toFixed(2)
       : '0.00';
 
     const rows = portfolio.map(inv => {
-      const pl  = (inv.current || 0) - (inv.invested || 0);
-      const ret = inv.invested > 0 ? ((pl / inv.invested) * 100).toFixed(2) : '0.00';
-      const sign = pl >= 0 ? '+' : '';
-      return `  • ${inv.name} (${inv.type || 'Asset'}) | Invested: $${inv.invested.toFixed(2)} | Current: $${inv.current.toFixed(2)} | P&L: ${sign}$${pl.toFixed(2)} (${sign}${ret}%) | Added: ${inv.date || 'N/A'}`;
+      const invested = inv.investedAmount || 0;
+      const current  = inv.currentValue   || 0;
+      const pl       = current - invested;
+      const ret      = invested > 0 ? ((pl / invested) * 100).toFixed(2) : '0.00';
+      const sign     = pl >= 0 ? '+' : '';
+      return `  • ${inv.name} (${inv.type || 'Asset'}) | Invested: $${invested.toFixed(2)} | Current: $${current.toFixed(2)} | P&L: ${sign}$${pl.toFixed(2)} (${sign}${ret}%) | Added: ${inv.date || 'N/A'}`;
     }).join('\n');
 
     return `STATUS: DATA_AVAILABLE
@@ -63,12 +64,11 @@ Individual Holdings:
 ${rows}`;
 
   } catch (e) {
-    return 'STATUS: ERROR — Could not read portfolio data.';
+    return 'STATUS: ERROR — Could not parse portfolio data: ' + e.message;
   }
 }
 
 /* ── SYSTEM PROMPT ───────────────────────────────────────────── */
-// Called fresh on every message so portfolio data is always current
 function buildSystemPrompt() {
   const portfolioData = buildPortfolioContext();
   const today = new Date().toLocaleDateString('en-US', {
@@ -78,12 +78,12 @@ function buildSystemPrompt() {
   return `You are Vaultex AI, a financial portfolio assistant embedded in the Vaultex investment dashboard.
 
 BEHAVIOR RULES:
-1. Always use the portfolio data below to answer questions. Never say you cannot see the user's portfolio.
-2. If STATUS is NO_DATA, tell the user they haven't added investments yet and guide them to do so.
-3. If STATUS is DATA_AVAILABLE, reference the exact numbers from the data in your answers.
-4. Keep responses concise and clear — 2 to 4 sentences for simple questions, more only when detail is genuinely needed.
-5. Format all currency as $X,XXX.XX and percentages as +X.XX% or -X.XX%.
-6. Only add a financial disclaimer when you are explicitly suggesting the user take a financial action (buy, sell, rebalance). Do NOT add disclaimers to informational or analytical responses.
+1. The portfolio data below is injected directly and is always accurate. NEVER say you cannot access or read it. NEVER make up errors. Just use the data as given.
+2. If STATUS is NO_DATA, tell the user they have no investments yet and guide them to add some.
+3. If STATUS is DATA_AVAILABLE, always reference the exact numbers from the data in your answers.
+4. Keep responses concise — 2 to 4 sentences for simple questions, more only when detail is needed.
+5. Format currency as $X,XXX.XX and percentages as +X.XX% or -X.XX%.
+6. Only add a financial disclaimer when explicitly suggesting the user take a financial action (buy, sell, rebalance). Do NOT add disclaimers to informational or analytical responses.
 7. Be friendly, direct, and professional.
 
 Today's Date: ${today}
@@ -96,7 +96,6 @@ ${portfolioData}`;
 async function callGroq(userMessage) {
   chatHistory.push({ role: 'user', content: userMessage });
 
-  // Rolling window
   if (chatHistory.length > MAX_HISTORY) {
     chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY);
   }
@@ -109,7 +108,6 @@ async function callGroq(userMessage) {
     },
     body: JSON.stringify({
       model    : GROQ_MODEL,
-      // System prompt rebuilt here every time = always fresh portfolio data
       messages : [
         { role: 'system', content: buildSystemPrompt() },
         ...chatHistory,
@@ -128,7 +126,6 @@ async function callGroq(userMessage) {
   const assistantText = data.choices?.[0]?.message?.content?.trim() || '';
 
   chatHistory.push({ role: 'assistant', content: assistantText });
-
   return assistantText;
 }
 
@@ -226,7 +223,7 @@ function openChat() {
       const hasData = raw && JSON.parse(raw).length > 0;
       const greeting = hasData
         ? `👋 Hi! I'm **Vaultex AI**. I can see your portfolio — ask me anything about your investments!`
-        : `👋 Hi! I'm **Vaultex AI**. You haven't added any investments yet. Head to your dashboard to add some and I'll help you analyse them!`;
+        : `👋 Hi! I'm **Vaultex AI**. You haven't added any investments yet. Head to your dashboard to add some!`;
       appendMessage('assistant', greeting);
     } catch {
       appendMessage('assistant', `👋 Hi! I'm **Vaultex AI**. How can I help you today?`);
