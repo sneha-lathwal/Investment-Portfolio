@@ -384,16 +384,17 @@
 
 [data-theme="light"] .chat-toggle--active svg { color: #1a1a2e; }
 
-/* ── Mobile — Bottom Sheet Style ───────────────────────────── */
+/* ================= MOBILE CHATBOT ================= */
 @media (max-width: 600px) {
 
-  /* Toggle button — hug the safe-area bottom on notched phones */
+  /* ===== Toggle Button ===== */
   .chat-toggle-btn {
+    position: fixed;
     right: 16px;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    margin-bottom: 20px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
     width: 52px;
     height: 52px;
+    z-index: 999;
   }
 
   .chat-toggle-btn svg {
@@ -401,34 +402,30 @@
     height: 22px;
   }
 
-  /* Panel becomes a full-width bottom sheet */
+  /* ===== Chat Panel (Bottom Sheet) ===== */
   .chat-panel {
-    /* Stretch edge-to-edge */
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
+
     width: 100%;
-    max-width: 100%;
+    height: 82dvh; /* modern mobile height */
 
-    /* Slide up from the bottom instead of floating */
-    border-radius: 20px 20px 0 0;
+    border-radius: 18px 18px 0 0;
+    background: var(--chat-bg);
 
-    /* Fill most of the screen but leave room above */
-    height: 82dvh;          /* dvh accounts for browser chrome on mobile */
-    height: 82vh;           /* fallback for older browsers */
-    max-height: 82dvh;
-    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
 
-    /* Slide-up animation on mobile */
     transform: translateY(100%);
-    transform-origin: bottom center;
-    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
 
-    /* Account for notch / home bar at bottom */
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    transition: transform 0.35s ease, opacity 0.25s ease;
 
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+    padding-bottom: env(safe-area-inset-bottom);
+
+    box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.4);
   }
 
   .chat-panel--open {
@@ -436,25 +433,27 @@
     opacity: 1;
   }
 
-  /* Drag handle hint at the top of the sheet */
+  /* ===== Drag Handle ===== */
   .chat-panel::before {
-    content: '';
-    display: block;
+    content: "";
     width: 36px;
     height: 4px;
-    border-radius: 99px;
-    background: rgba(255, 255, 255, 1);
-    margin: 10px auto 0;
-    flex-shrink: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.5);
+    margin: 10px auto;
   }
 
   [data-theme="light"] .chat-panel::before {
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.2);
   }
 
-  /* Header — slightly taller touch targets */
+  /* ===== Header ===== */
   .chat-header {
-    padding: 12px 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 14px;
   }
 
   .chat-header-avatar {
@@ -463,67 +462,71 @@
     font-size: 15px;
   }
 
-  /* Bigger tap targets for header buttons (min 44px per Apple HIG) */
   .chat-header-btn {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 10px;
-    font-size: 15px;
   }
 
-  /* Messages — smooth momentum scrolling on iOS */
+  /* ===== Messages ===== */
   .chat-messages {
-    padding: 12px 12px;
+    flex: 1;
+    overflow-y: auto;
+
+    padding: 12px;
     gap: 8px;
+
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Slightly larger bubbles for readability */
   .chat-bubble {
     font-size: 14px;
-    padding: 10px 13px;
+    padding: 10px 12px;
+    line-height: 1.4;
   }
 
-  /* Suggestions — horizontal scroll so they never wrap awkwardly */
+  /* ===== Suggestions (Horizontal Scroll) ===== */
   .chat-suggestions {
-    flex-wrap: nowrap;
+    display: flex;
+    gap: 8px;
+
     overflow-x: auto;
-    overflow-y: hidden;
     padding: 0 12px 10px;
-    gap: 7px;
-    -webkit-overflow-scrolling: touch;
+
     scrollbar-width: none;
   }
 
-  .chat-suggestions::-webkit-scrollbar { display: none; }
-
-  .chat-suggestion-chip {
-    flex-shrink: 0;           /* don't squish chips */
-    font-size: 12px;
-    padding: 6px 12px;
-    /* Tap highlight for touch feedback */
-    -webkit-tap-highlight-color: rgba(245, 197, 24, 0.15);
+  .chat-suggestions::-webkit-scrollbar {
+    display: none;
   }
 
-  /* Input area — prevent iOS from zooming on focus (needs font-size >= 16px) */
+  .chat-suggestion-chip {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  /* ===== Input Area ===== */
   .chat-input-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
     padding: 10px 12px;
-    /* Push above the keyboard when it opens */
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
   }
 
   .chat-input {
-    font-size: 16px;          /* ← critical: stops iOS auto-zoom on focus */
+    flex: 1;
+    font-size: 16px; /* prevents iOS zoom */
     padding: 10px 12px;
     border-radius: 14px;
   }
 
-  /* Larger send button tap target */
   .chat-send-btn {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    -webkit-tap-highlight-color: transparent;
   }
 
   .chat-send-btn svg {
@@ -531,16 +534,17 @@
     height: 18px;
   }
 
-  /* Disable hover scale on touch devices — it gets stuck */
-  .chat-toggle-btn:hover { transform: none; }
-  .chat-send-btn:hover:not(:disabled) { transform: none; }
+  /* Disable hover on mobile */
+  .chat-toggle-btn:hover,
+  .chat-send-btn:hover {
+    transform: none;
+  }
 }
 
-/* Tiny phones (SE, Galaxy A series) */
+/* ===== Small Phones ===== */
 @media (max-width: 375px) {
   .chat-panel {
     height: 88dvh;
-    height: 88vh;
   }
 
   .chat-bubble {
@@ -548,16 +552,16 @@
   }
 }
 
-/* Landscape phones — cap height so input is always visible */
+/* ===== Landscape Mode ===== */
 @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
   .chat-panel {
-    height: 90dvh;
-    height: 90vh;
-    border-radius: 0 16px 0 0;
-    left: auto;
     width: min(380px, 55vw);
-    bottom: 0;
+    height: 90dvh;
+
     right: 0;
+    left: auto;
+
+    border-radius: 16px 0 0 0;
   }
 
   .chat-toggle-btn {
