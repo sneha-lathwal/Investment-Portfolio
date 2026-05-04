@@ -13,7 +13,7 @@
 /* ── CONFIG ─────────────────────────────────────────────────── */
 // ⚠️  Replace with your actual Anthropic API key.
 // Get one at https://console.anthropic.com/
-const ANTHROPIC_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE';
+const ANTHROPIC_API_KEY = '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';
 
 const CHAT_STORAGE_KEY = 'vaultex_chat_history';
 const MAX_HISTORY      = 20;   // messages kept in memory (rolling window)
