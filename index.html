@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="chatbot.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
@@ -331,6 +332,74 @@
     </div>
   </footer>
 
+  <!-- ── Vaultex AI Chatbot ── -->
+<button
+  id="chat-toggle-btn"
+  class="chat-toggle-btn"
+  aria-label="Open AI assistant"
+  aria-expanded="false"
+  title="Ask Vaultex AI"
+>
+  <!-- Chat icon (shown when closed) -->
+  <svg class="chat-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#000">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <!-- Close icon (shown when open) -->
+  <svg class="chat-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="color:#e8e8f0">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+</button>
+
+<div id="chat-panel" class="chat-panel" role="dialog" aria-label="Vaultex AI Assistant" aria-modal="false">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header-avatar">V</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">Vaultex AI</div>
+      <div class="chat-header-status">Online — Portfolio aware</div>
+    </div>
+    <div class="chat-header-actions">
+      <button id="chat-clear-btn" class="chat-header-btn" title="Clear chat" aria-label="Clear chat history">🗑</button>
+      <button id="chat-close-btn" class="chat-header-btn" title="Close" aria-label="Close chat">✕</button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div id="chat-messages" class="chat-messages" aria-live="polite" aria-label="Chat messages"></div>
+
+  <!-- Suggested prompts -->
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button class="chat-suggestion-chip" onclick="useSuggestion(this)">How's my portfolio doing?</button>
+    <button class="chat-suggestion-chip" onclick="useSuggestion(this)">Which asset has best return?</button>
+    <button class="chat-suggestion-chip" onclick="useSuggestion(this)">Am I diversified?</button>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input-area">
+    <textarea
+      id="chat-input"
+      class="chat-input"
+      placeholder="Ask about your portfolio…"
+      rows="1"
+      aria-label="Message input"
+    ></textarea>
+    <button id="chat-send-btn" class="chat-send-btn" aria-label="Send message">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
   <script src="script.js"></script>
+  <script>
+  function useSuggestion(btn) {
+    const input = document.getElementById('chat-input');
+    input.value = btn.textContent;
+    document.getElementById('chat-suggestions').style.display = 'none';
+    document.getElementById('chat-send-btn').click();
+  }
+</script>
+  <script src="chatbot.js"></script>
 </body>
 </html>
