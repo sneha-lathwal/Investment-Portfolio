@@ -384,17 +384,183 @@
 
 [data-theme="light"] .chat-toggle--active svg { color: #1a1a2e; }
 
-/* ── Mobile ────────────────────────────────────────────────── */
-@media (max-width: 480px) {
+/* ── Mobile — Bottom Sheet Style ───────────────────────────── */
+@media (max-width: 600px) {
+
+  /* Toggle button — hug the safe-area bottom on notched phones */
+  .chat-toggle-btn {
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 52px;
+    height: 52px;
+  }
+
+  .chat-toggle-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Panel becomes a full-width bottom sheet */
   .chat-panel {
-    right: 12px;
-    bottom: 90px;
-    width: calc(100vw - 24px);
-    height: 70vh;
+    /* Stretch edge-to-edge */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+
+    /* Slide up from the bottom instead of floating */
+    border-radius: 20px 20px 0 0;
+
+    /* Fill most of the screen but leave room above */
+    height: 82dvh;          /* dvh accounts for browser chrome on mobile */
+    height: 82vh;           /* fallback for older browsers */
+    max-height: 82dvh;
+    max-height: 82vh;
+
+    /* Slide-up animation on mobile */
+    transform: translateY(100%);
+    transform-origin: bottom center;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Account for notch / home bar at bottom */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .chat-panel--open {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Drag handle hint at the top of the sheet */
+  .chat-panel::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+
+  [data-theme="light"] .chat-panel::before {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  /* Header — slightly taller touch targets */
+  .chat-header {
+    padding: 12px 16px 14px;
+  }
+
+  .chat-header-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  /* Bigger tap targets for header buttons (min 44px per Apple HIG) */
+  .chat-header-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+
+  /* Messages — smooth momentum scrolling on iOS */
+  .chat-messages {
+    padding: 12px 12px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Slightly larger bubbles for readability */
+  .chat-bubble {
+    font-size: 14px;
+    padding: 10px 13px;
+  }
+
+  /* Suggestions — horizontal scroll so they never wrap awkwardly */
+  .chat-suggestions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 12px 10px;
+    gap: 7px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .chat-suggestions::-webkit-scrollbar { display: none; }
+
+  .chat-suggestion-chip {
+    flex-shrink: 0;           /* don't squish chips */
+    font-size: 12px;
+    padding: 6px 12px;
+    /* Tap highlight for touch feedback */
+    -webkit-tap-highlight-color: rgba(245, 197, 24, 0.15);
+  }
+
+  /* Input area — prevent iOS from zooming on focus (needs font-size >= 16px) */
+  .chat-input-area {
+    padding: 10px 12px;
+    /* Push above the keyboard when it opens */
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+  }
+
+  .chat-input {
+    font-size: 16px;          /* ← critical: stops iOS auto-zoom on focus */
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  /* Larger send button tap target */
+  .chat-send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .chat-send-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Disable hover scale on touch devices — it gets stuck */
+  .chat-toggle-btn:hover { transform: none; }
+  .chat-send-btn:hover:not(:disabled) { transform: none; }
+}
+
+/* Tiny phones (SE, Galaxy A series) */
+@media (max-width: 375px) {
+  .chat-panel {
+    height: 88dvh;
+    height: 88vh;
+  }
+
+  .chat-bubble {
+    font-size: 13.5px;
+  }
+}
+
+/* Landscape phones — cap height so input is always visible */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  .chat-panel {
+    height: 90dvh;
+    height: 90vh;
+    border-radius: 0 16px 0 0;
+    left: auto;
+    width: min(380px, 55vw);
+    bottom: 0;
+    right: 0;
   }
 
   .chat-toggle-btn {
-    right: 16px;
-    bottom: 20px;
+    right: 14px;
+    bottom: 14px;
   }
 }
