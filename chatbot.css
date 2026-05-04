@@ -391,6 +391,7 @@
   .chat-toggle-btn {
     right: 16px;
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    margin-bottom: 20px;
     width: 52px;
     height: 52px;
   }
