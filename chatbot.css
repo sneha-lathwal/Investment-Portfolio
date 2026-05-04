@@ -1,6 +1,9 @@
 /* ============================================================
    VAULTEX CHATBOT — Add this block to the END of style.css
    ============================================================ */
+[data-theme="dark"] .chat-panel {
+  background: #000000 !important;
+}
 
 /* ── Toggle Button ─────────────────────────────────────────── */
 .chat-toggle-btn {
