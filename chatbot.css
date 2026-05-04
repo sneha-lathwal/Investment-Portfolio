@@ -443,7 +443,7 @@
     width: 36px;
     height: 4px;
     border-radius: 99px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 1);
     margin: 10px auto 0;
     flex-shrink: 0;
   }
